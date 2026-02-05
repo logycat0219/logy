@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>籤籤中 卦卦準 - 靈龜求籤</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            border: 2px solid #d4af37;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, transparent 70%);
+            z-index: -1;
+        }
+        
+        .app-title {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.8);
+            letter-spacing: 3px;
+            color: #ffd700;
+            background: linear-gradient(to right, #ffd700, #ffec8b, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .app-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .turtle-container {
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 30px;
+            position: relative;
+            perspective: 1000px;
+        }
+        
+        .turtle {
+            width: 100%;
+            height: 100%;
+            background: url('https://img.zhaotu.com/temp_ele/20231222/9fc5931a3e73eff8ea050baec35a878f.png') center/contain no-repeat;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+        }
+        
+        .coins {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .coin {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(145deg, #d4af37, #ffd700, #d4af37);
+            border-radius: 50%;
+            border: 2px solid #c19b07;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #8b0000;
+            font-size: 18px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-free {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
+        }
+        
+        .btn-paid {
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            color: #8b0000;
+            box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .result-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 1px solid #d4af37;
+            display: none;
+        }
+        
+        .result-title {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+        
+        .pattern-display {
+            text-align: center;
+            font-size: 1.5rem;
+            letter-spacing: 10px;
+            margin: 20px 0;
+            background: rgba(212, 175, 55, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+        }
+        
+        .interpretation {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            text-align: justify;
+        }
+        
+        .paid-service {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            border: 2px solid #ff9a9e;
+        }
+        
+        .paid-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+        
+        .price-tag {
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            color: #8b0000;
+            font-size: 2rem;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 50px;
+            display: inline-block;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
+        }
+        
+        .whatsapp-btn {
+            background: linear-gradient(to right, #25D366, #128C7E);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+        }
+        
+        .whatsapp-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.6);
+        }
+        
+        .instructions {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 0.95rem;
+            border: 1px solid #4facfe;
+        }
+        
+        .instructions h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #4facfe;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+            line-height: 1.8;
+        }
+        
+        .shaking {
+            animation: shake 0.5s infinite;
+        }
+        
+        @keyframes shake {
+            0% { transform: translateX(0) rotate(0deg); }
+            20% { transform: translateX(-10px) rotate(-5deg); }
+            40% { transform: translateX(10px) rotate(5deg); }
+            60% { transform: translateX(-10px) rotate(-5deg); }
+            80% { transform: translateX(10px) rotate(5deg); }
+            100% { transform: translateX(0) rotate(0deg); }
+        }
+        
+        .fortune-animation {
+            animation: fortuneReveal 2s forwards;
+        }
+        
+        @keyframes fortuneReveal {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .yin-yang {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 25%, #000 10%, #fff 10%);
+            border: 1px solid #000;
+            position: relative;
+        }
+        
+        .yin-yang::before {
+            content: "";
+            position: absolute;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: #fff;
+            border-radius: 50%;
+            border: 1px solid #000;
+        }
+        
+        .yang {
+            background: radial-gradient(circle at 50% 25%, #fff 10%, #000 10%);
+        }
+        
+        .yang::before {
+            background: #000;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        @media (max-width: 600px) {
+            .app-title {
+                font-size: 2rem;
+            }
+            
+            .turtle-container {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="app-title">籤籤中 卦卦準</h1>
+            <p class="app-subtitle">靈龜銅錢占卜 · 預測未來運勢</p>
+            
+            <div class="turtle-container">
+                <div class="turtle" id="turtle">
+                    <div class="coins">
+                        <div class="coin" id="coin1">㊍</div>
+                        <div class="coin" id="coin2">㊍</div>
+                        <div class="coin" id="coin3">㊍</div>
+                        <div class="coin" id="coin4">㊍</div>
+                        <div class="coin" id="coin5">㊍</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-free" id="freeFortuneBtn">
+                    <i class="fas fa-dragon"></i> 免費求籤
+                </button>
+                <button class="btn btn-paid" id="paidFortuneBtn">
+                    <i class="fas fa-crown"></i> 法師代求 (100元/問)
+                </button>
+            </div>
+        </header>
+        
+        <div class="result-container" id="resultContainer">
+            <h2 class="result-title" id="fortuneName"></h2>
+            <div class="pattern-display" id="fortunePattern"></div>
+            <p class="interpretation" id="fortuneInterpretation"></p>
+        </div>
+        
+        <div class="paid-service">
+            <h2 class="paid-title">法師代求籤服務</h2>
+            <p>由專業法師為您親自求籤解卦，深入解讀運勢</p>
+            <div class="price-tag">每問 NT$ 100</div>
+            <p>點擊下方按鈕，通過WhatsApp與法師聯繫</p>
+            
+            <button class="whatsapp-btn" id="whatsappBtn">
+                <i class="fab fa-whatsapp"></i> 聯繫法師
+            </button>
+        </div>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> 使用說明</h3>
+            <ol>
+                <li>點擊"免費求籤"按鈕，靈龜會為您搖出五枚銅錢</li>
+                <li>系統根據銅錢正反面（陰陽）組合生成卦象</li>
+                <li>解讀您的卦象，了解近期運勢</li>
+                <li>如需更深入解讀，可選擇"法師代求"服務</li>
+                <li>法師代求服務每問收費100元，通過WhatsApp聯繫</li>
+            </ol>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 籤籤中 卦卦準 · 心誠則靈</p>
+        </div>
+    </div>
+
+    <script>
+        // 卦象數據
+        const fortunes = [
+            { pattern: "陰陰陰陰陰", name: "星震卦", interpretation: "得天之助，社會之支持，福德充滿之幸運之象。凡事能積極進行，則更佳。" },
+            { pattern: "陰陽陽陽陽", name: "從隔卦", interpretation: "幸運已臨近，不必著急，前途非常光明，只要望著既定目標努力進行，必能有成。" },
+            { pattern: "陽陰陽陽陽", name: "曲直卦", interpretation: "天雖不從人願，使你勞苦有加，然萬勿灰心洩氣，忍耐上進，相信最後勝利將屬於你。" },
+            { pattern: "陽陽陰陽陽", name: "潤下卦", interpretation: "冬盡春來，大地萬象更新，花開喜溢，花落結果之幸運之象。" },
+            { pattern: "陽陽陽陰陽", name: "災正卦", interpretation: "要有百折不撓的精神，繼續向前邁進，才能克服困難，打開僵局，見到光明，要是畏縮不進，將更陷入困窮境地。" },
+            { pattern: "陽陽陽陽陰", name: "進檣卦", interpretation: "遇到任何挫折時，切不可自暴自棄，不斷的努力，他日必有好光景。" },
+            { pattern: "陰陰陽陽陽", name: "進求卦", interpretation: "在年輕時代，雖嘗了不少苦，只要有進取心，不氣餒，終會苦盡甘來，這是雪上開花之象。" },
+            { pattern: "陰陽陰陽陽", name: "進寶卦", interpretation: "語云「有德之人，天報以德。」從此辛勞已得果，幸運到訪，精神物質兩如意。" },
+            { pattern: "陰陽陽陽陰", name: "獲安卦", interpretation: "雖有各種各樣的問題，常使心不安，但只要繼續努力，事態必能漸見好轉。" },
+            { pattern: "陰陽陽陰陽", name: "遂心卦", interpretation: "名利雙收，衣食豐隆！令人羨慕的幸運。" },
+            { pattern: "陽陰陰陽陽", name: "災散卦", interpretation: "喜氣盈滿，可獲得父母、朋友、上司、前輩的助力，同時更能給予周圍的人份外的好感。" },
+            { pattern: "陽陰陽陰陽", name: "上進卦", interpretation: "處事須有勇氣，必可得上司、前輩的提拔，好機會已迫近眼前，應好好利用。" },
+            { pattern: "陽陰陽陽陰", name: "暗昧卦", interpretation: "維持現狀，靜以待時，交際、交易、說話都要謹慎，以免招來災禍。" },
+            { pattern: "陽陽陰陰陽", name: "安靜卦", interpretation: "計劃的事，已進行的事，波折橫生，使你深受打擊，但別衝動，冷靜地研究對策，以靜制動吧！" },
+            { pattern: "陽陽陰陽陰", name: "玄武卦", interpretation: "運不佳，只有保守現狀外，別無良法。他助不如自助，求人不如求己。" },
+            { pattern: "陽陽陽陰陰", name: "保安卦", interpretation: "飛黃騰達的時機，應該積極的進行，一定有好的收穫。工作、經商按照新的計劃一件一件地進行吧！" },
+            { pattern: "陰陰陰陽陽", name: "喜至卦", interpretation: "不必著急，只要堅守現在的崗位，充實自己的一切力量，開運機會已不遠。" },
+            { pattern: "陰陰陽陰陽", name: "保命卦", interpretation: "運氣不順，連綿不斷的打擊，使你失掉信心，且常與骨肉之親發生爭執，並多招惹口舌是非。" },
+            { pattern: "陰陰陽陽陰", name: "猶豫卦", interpretation: "春在人間，大地到處充滿了鳥語花香，此時的你是被幸福所包圍。" },
+            { pattern: "陰陽陰陰陽", name: "豐稔卦", interpretation: "沒有比現在更幸運，更幸福的時候到了，所謀所望皆如意，可以好好計劃事業，著手進行。" },
+            { pattern: "陰陽陰陽陰", name: "得祿卦", interpretation: "過去雖有糾紛，或不如意的事，現在已解決告一段落，從此光明漸見。" },
+            { pattern: "陰陽陽陰陰", name: "明顯卦", interpretation: "過去的貧困和煩惱，都已經煙消雲散，從此物質精神兩無憂，自由自在樂安康。" },
+            { pattern: "陽陰陰陰陽", name: "祐福卦", interpretation: "機會總是不湊巧，要見的人見不到，徒勞往返，不如意事十之八九。" },
+            { pattern: "陽陰陰陽陰", name: "凝滯卦", interpretation: "多年來所計劃的一切事宜，已漸接近實現階段，只要百尺竿頭更進一步，前途可說光明極了。" },
+            { pattern: "陽陰陽陰陰", name: "顯達卦", interpretation: "忍耐和努力的結果，使你由不安和困苦中漸入佳境。" },
+            { pattern: "陽陽陰陰陰", name: "福源卦", interpretation: "不應自滿，凡事謹慎從事，做事自然安全。" },
+            { pattern: "陽陰陰陰陰", name: "太平卦", interpretation: "經一番勞苦後，幸福的女神終於向你靠近，此時開運的序曲已開始彈奏。" },
+            { pattern: "陰陰陰陽陰", name: "顛險卦", interpretation: "只要你野心不太大，你的花園是充滿安泰。工作方面、金錢方面皆順利。" },
+            { pattern: "陰陰陽陰陰", name: "開發卦", interpretation: "沒有什麼可憂心的問題，一年四季中，平和愉快地過活。有時也有意外的幸運來臨，使你長年的努力，獲得應有的報酬。" },
+            { pattern: "陰陰陰陰陽", name: "揚吉卦", interpretation: "現時處境猶如臨深淵，如履薄冰，心情不免戰戰兢兢。須以冷靜的頭腦去克服困難，必可開創光明的前途。" },
+            { pattern: "陰陽陰陰陰", name: "後吉卦", interpretation: "如深陷泥沼中，進退維谷，時時有嫉妒和反感，阻礙你前進道路，使你不得不苦勞。" },
+            { pattern: "陽陽陽陽陽", name: "不利卦", interpretation: "你的寶鏡蒙上灰塵，不能照出你美妙的姿態。在不安的生活中，身心疲憊。要特別注意健康方面。" }
+        ];
+
+        // DOM元素
+        const turtle = document.getElementById('turtle');
+        const coins = [
+            document.getElementById('coin1'),
+            document.getElementById('coin2'),
+            document.getElementById('coin3'),
+            document.getElementById('coin4'),
+            document.getElementById('coin5')
+        ];
+        const freeFortuneBtn = document.getElementById('freeFortuneBtn');
+        const paidFortuneBtn = document.getElementById('paidFortuneBtn');
+        const whatsappBtn = document.getElementById('whatsappBtn');
+        const resultContainer = document.getElementById('resultContainer');
+        const fortuneName = document.getElementById('fortuneName');
+        const fortunePattern = document.getElementById('fortunePattern');
+        const fortuneInterpretation = document.getElementById('fortuneInterpretation');
+
+        // 免費求籤功能
+        freeFortuneBtn.addEventListener('click', () => {
+            // 開始動畫
+            turtle.classList.add('shaking');
+            freeFortuneBtn.disabled = true;
+            
+            // 清除之前的结果
+            resultContainer.style.display = 'none';
+            
+            // 模擬搖籤過程
+            setTimeout(() => {
+                turtle.classList.remove('shaking');
+                
+                // 隨機生成五枚銅錢正反面
+                const pattern = [];
+                for (let i = 0; i < 5; i++) {
+                    const isYang = Math.random() > 0.5;
+                    coins[i].textContent = isYang ? '㊋' : '㊍';
+                    pattern.push(isYang ? '陽' : '陰');
+                }
+                
+                const patternStr = pattern.join('');
+                
+                // 找到對應的卦象
+                const fortune = fortunes.find(f => f.pattern === patternStr) || fortunes[0];
+                
+                // 顯示結果
+                fortuneName.textContent = fortune.name;
+                
+                // 格式化卦象顯示
+                fortunePattern.innerHTML = '';
+                pattern.forEach(symbol => {
+                    const span = document.createElement('span');
+                    span.textContent = symbol;
+                    span.style.margin = '0 10px';
+                    span.style.fontSize = '2rem';
+                    fortunePattern.appendChild(span);
+                });
+                
+                fortuneInterpretation.textContent = fortune.interpretation;
+                
+                // 顯示結果並添加動畫
+                resultContainer.style.display = 'block';
+                resultContainer.classList.add('fortune-animation');
+                
+                // 重新啟用按鈕
+                freeFortuneBtn.disabled = false;
+            }, 2000);
+        });
+
+        // 付費服務 - WhatsApp 連結
+        whatsappBtn.addEventListener('click', () => {
+            window.open('https://wa.me/85292198364', '_blank');
+        });
+
+        paidFortuneBtn.addEventListener('click', () => {
+            window.open('https://wa.me/85292198364', '_blank');
+        });
+
+        // 初始顯示一個卦象
+        window.addEventListener('load', () => {
+            const initialFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+            fortuneName.textContent = initialFortune.name;
+            
+            // 格式化卦象顯示
+            const pattern = initialFortune.pattern.split('');
+            fortunePattern.innerHTML = '';
+            pattern.forEach(symbol => {
+                const span = document.createElement('span');
+                span.textContent = symbol;
+                span.style.margin = '0 10px';
+                span.style.fontSize = '2rem';
+                fortunePattern.appendChild(span);
+            });
+            
+            fortuneInterpretation.textContent = initialFortune.interpretation;
+            resultContainer.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
