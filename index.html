@@ -231,9 +231,7 @@
             font-size: 20px;
             position: relative;
             z-index: 3;
-        }
-        
-               
+               }
         
         .controls {
             display: flex;
@@ -361,7 +359,7 @@
             background: rgba(0, 0, 0, 0.4);
             border-radius: 20px;
             padding: 20px;
-            margin-top: 30px;
+            margin: 30px 0;
             font-size: 0.95rem;
             border: 1px solid #4facfe;
         }
@@ -430,9 +428,98 @@
             background: #000;
         }
         
+        /* YouTube影片播放器 - 移至最下方 */
+        .youtube-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 30px 0 10px 0;
+            border: 2px solid #ff0000;
+            text-align: center;
+        }
+        
+        .youtube-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .youtube-title i {
+            color: #ff0000;
+        }
+        
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 比例 */
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+        }
+        
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .video-description {
+            margin-top: 15px;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+        
+        .video-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .video-btn {
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .play-btn {
+            background: linear-gradient(to right, #ff0000, #cc0000);
+            color: white;
+        }
+        
+        .pause-btn {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: white;
+        }
+        
+        .mute-btn {
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            color: #8b0000;
+        }
+        
+        .video-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
         .footer {
             text-align: center;
-            margin-top: 40px;
+            margin-top: 20px;
             padding: 20px;
             font-size: 0.9rem;
             color: rgba(255, 255, 255, 0.7);
@@ -463,6 +550,19 @@
                 width: 28px;
                 height: 28px;
                 font-size: 16px;
+            }
+            
+            .video-controls {
+                flex-wrap: wrap;
+            }
+            
+            .video-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .youtube-container {
+                margin: 20px 0 0 0;
             }
         }
     </style>
@@ -526,7 +626,7 @@
         
         <div class="paid-service">
             <h2 class="paid-title">師傅代求籤服務</h2>
-            <p>由專業師傅為您親自求籤解卦，深入解讀運勢</p>
+            <p>由師傅為您親自求籤解卦，深入解讀運勢</p>
             <div class="price-tag">每問 HK$ 100</div>
             <p>點擊下方按鈕，通過WhatsApp與師傅聯繫</p>
             
@@ -541,9 +641,41 @@
                 <li>點擊"免費求籤"按鈕，靈龜會為您搖出五枚銅錢</li>
                 <li>系統根據銅錢正反面（陰陽）組合生成卦象</li>
                 <li>解讀您的卦象，了解近期運勢</li>
+                <li>觀看下方卜卦影片了解更多占卜知識</li>
                 <li>如需更深入解讀，可選擇"師傅代求"服務</li>
                 <li>師傅代求服務每問收費100元，通過WhatsApp聯繫</li>
             </ol>
+        </div>
+        
+        <!-- YouTube影片播放器 - 移至最下方 -->
+        <div class="youtube-container">
+            <h2 class="youtube-title">
+                <i class="fab fa-youtube"></i> 占卜示範影片(示範片段為災散卦)
+            </h2>
+            <div class="video-wrapper">
+                <iframe id="youtubeVideo" 
+                        src="https://www.youtube.com/embed/6cDM0q3hdyI?enablejsapi=1" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+            </div>
+            
+            <div class="video-controls">
+                <button class="video-btn play-btn" id="playVideo">
+                    <i class="fas fa-play"></i> 播放
+                </button>
+                <button class="video-btn pause-btn" id="pauseVideo">
+                    <i class="fas fa-pause"></i> 暫停
+                </button>
+                <button class="video-btn mute-btn" id="muteVideo">
+                    <i class="fas fa-volume-up"></i> 靜音/取消靜音
+                </button>
+            </div>
+            
+            <p class="video-description">
+                觀看此影片了解靈龜占卜的傳統文化和使用方法。影片展示了傳統占卜儀式，幫助您更好地理解本網頁的求籤原理。
+            </p>
         </div>
         
         <div class="footer">
@@ -604,6 +736,71 @@
         const fortuneName = document.getElementById('fortuneName');
         const fortunePattern = document.getElementById('fortunePattern');
         const fortuneInterpretation = document.getElementById('fortuneInterpretation');
+        
+        // YouTube相關元素
+        const youtubeVideo = document.getElementById('youtubeVideo');
+        const playVideoBtn = document.getElementById('playVideo');
+        const pauseVideoBtn = document.getElementById('pauseVideo');
+        const muteVideoBtn = document.getElementById('muteVideo');
+
+        // YouTube API載入
+        let player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtubeVideo', {
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            console.log('YouTube播放器已準備就緒');
+        }
+
+        function onPlayerStateChange(event) {
+            // 播放狀態變化時的處理
+            console.log('播放器狀態變化:', event.data);
+        }
+
+        // 影片控制功能
+        playVideoBtn.addEventListener('click', () => {
+            if (player && typeof player.playVideo === 'function') {
+                player.playVideo();
+            } else {
+                // 備用方法
+                youtubeVideo.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+            }
+        });
+
+        pauseVideoBtn.addEventListener('click', () => {
+            if (player && typeof player.pauseVideo === 'function') {
+                player.pauseVideo();
+            } else {
+                // 備用方法
+                youtubeVideo.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+            }
+        });
+
+        let isMuted = false;
+        muteVideoBtn.addEventListener('click', () => {
+            if (player && typeof player.isMuted === 'function') {
+                if (player.isMuted()) {
+                    player.unMute();
+                    muteVideoBtn.innerHTML = '<i class="fas fa-volume-up"></i> 靜音';
+                } else {
+                    player.mute();
+                    muteVideoBtn.innerHTML = '<i class="fas fa-volume-mute"></i> 取消靜音';
+                }
+            } else {
+                // 備用方法
+                isMuted = !isMuted;
+                youtubeVideo.contentWindow.postMessage(`{"event":"command","func":"${isMuted ? 'mute' : 'unMute'}","args":""}`, '*');
+                muteVideoBtn.innerHTML = isMuted 
+                    ? '<i class="fas fa-volume-mute"></i> 取消靜音'
+                    : '<i class="fas fa-volume-up"></i> 靜音';
+            }
+        });
 
         // 免費求籤功能
         freeFortuneBtn.addEventListener('click', () => {
@@ -683,6 +880,12 @@
             fortuneInterpretation.textContent = initialFortune.interpretation;
             resultContainer.style.display = 'block';
         });
+
+        // 載入YouTube API
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     </script>
 </body>
 </html>
