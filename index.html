@@ -6,7 +6,37 @@
     <title>籤籤中 卦卦準 - 靈龜求籤</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * {
+        *
+/* 遊覽數量計數器樣式 */
+ .visitor-counter {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 30px;
+            padding: 8px 20px;
+            margin: 10px auto 20px;
+            display: inline-block;
+            font-size: 0.9rem;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            animation: pulse 3s infinite;
+        }
+        
+        .visitor-counter i {
+            color: #ffd700;
+            margin-right: 5px;
+        }
+        
+        .visitor-counter span {
+            font-weight: bold;
+            color: #ffd700;
+            font-size: 1.1rem;
+            margin: 0 3px;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 2px 15px rgba(255, 215, 0, 0.6); }
+            100% { box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3); }
+        } {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -572,6 +602,9 @@
         <header>
             <h1 class="app-title">籤籤中 卦卦準</h1>
             <p class="app-subtitle">靈龜銅錢占卜 · 預測未來運勢</p>
+<div class="visitor-counter">
+                <i class="fas fa-users"></i> 今日瀏覽：<span id="todayCount">0</span> | 總瀏覽：<span id="totalCount">0</span>
+            </div>
             
             <div class="turtle-container">
                 <div class="turtle" id="turtle">
@@ -613,7 +646,7 @@
                     <i class="fas fa-dragon"></i> 免費求籤
                 </button>
                 <button class="btn btn-paid" id="paidFortuneBtn">
-                    <i class="fas fa-crown"></i> 師傅代求 (100元/問)
+                    <i class="fas fa-crown"></i> 小師兄代求 (100元/問)
                 </button>
             </div>
         </header>
@@ -625,13 +658,13 @@
         </div>
         
         <div class="paid-service">
-            <h2 class="paid-title">師傅代求籤服務</h2>
-            <p>由師傅為您親自求籤解卦，深入解讀運勢</p>
+            <h2 class="paid-title">小師兄代求籤服務</h2>
+            <p>由小師兄為您親自求籤解卦，深入解讀運勢</p>
             <div class="price-tag">每問 HK$ 100</div>
-            <p>點擊下方按鈕，通過WhatsApp與師傅聯繫</p>
+            <p>點擊下方按鈕，通過WhatsApp與小師兄聯繫</p>
             
             <button class="whatsapp-btn" id="whatsappBtn">
-                <i class="fab fa-whatsapp"></i> 聯繫師傅
+                <i class="fab fa-whatsapp"></i> 聯繫小師兄
             </button>
         </div>
         
@@ -642,8 +675,8 @@
                 <li>系統根據銅錢正反面（陰陽）組合生成卦象</li>
                 <li>解讀您的卦象，了解近期運勢</li>
                 <li>觀看下方卜卦影片了解更多占卜知識</li>
-                <li>如需更深入解讀，可選擇"師傅代求"服務</li>
-                <li>師傅代求服務每問收費100元，通過WhatsApp聯繫</li>
+                <li>如需更深入解讀，可選擇"小師兄代求"服務</li>
+                <li>小師兄代求服務每問收費100元，通過WhatsApp聯繫</li>
             </ol>
         </div>
         
@@ -683,41 +716,129 @@
         </div>
     </div>
 
-    <script>
+     <script>
+        // 遊覽數量計數器功能
+        class VisitorCounter {
+            constructor() {
+                this.todayCountElement = document.getElementById('todayCount');
+                this.totalCountElement = document.getElementById('totalCount');
+                this.storageKey = 'turtle_fortune_app_stats';
+                this.todayDate = new Date().toDateString();
+                this.init();
+            }
+            
+            init() {
+                this.loadStats();
+                this.incrementCount();
+                this.updateDisplay();
+            }
+            
+            loadStats() {
+                const savedStats = localStorage.getItem(this.storageKey);
+                if (savedStats) {
+                    this.stats = JSON.parse(savedStats);
+                    
+                    // 檢查是否是新的一天
+                    if (this.stats.lastVisitDate !== this.todayDate) {
+                        this.stats.todayCount = 0;
+                        this.stats.lastVisitDate = this.todayDate;
+                    }
+                } else {
+                    // 初次使用
+                    this.stats = {
+                        totalCount: 0,
+                        todayCount: 0,
+                        lastVisitDate: this.todayDate,
+                        firstVisitDate: this.todayDate
+                    };
+                }
+            }
+            
+            incrementCount() {
+                // 避免重複計數（同一session只計一次）
+                const sessionKey = 'has_counted_today';
+                if (!sessionStorage.getItem(sessionKey)) {
+                    this.stats.totalCount++;
+                    this.stats.todayCount++;
+                    sessionStorage.setItem(sessionKey, 'true');
+                    this.saveStats();
+                }
+            }
+            
+            updateDisplay() {
+                // 格式化數字顯示（每三位加逗號）
+                const formatNumber = (num) => {
+                    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                };
+                
+                this.todayCountElement.textContent = formatNumber(this.stats.todayCount);
+                this.totalCountElement.textContent = formatNumber(this.stats.totalCount);
+                
+                // 可選：添加動畫效果
+                this.todayCountElement.style.transform = 'scale(1.2)';
+                this.totalCountElement.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    this.todayCountElement.style.transform = 'scale(1)';
+                    this.totalCountElement.style.transform = 'scale(1)';
+                }, 300);
+            }
+            
+            saveStats() {
+                localStorage.setItem(this.storageKey, JSON.stringify(this.stats));
+                this.updateDisplay();
+            }
+            
+            // 額外功能：重置計數器（開發用）
+            resetStats() {
+                if (confirm('確定要重置計數器嗎？')) {
+                    localStorage.removeItem(this.storageKey);
+                    sessionStorage.removeItem('has_counted_today');
+                    this.init();
+                }
+            }
+            
+            // 獲取統計數據
+            getStats() {
+                return this.stats;
+            }
+        }
+        
+        // 初始化計數器
+        const visitorCounter = new VisitorCounter();
         // 卦象數據
         const fortunes = [
-            { pattern: "陰陰陰陰陰", name: "星震卦", interpretation: "得天之助，社會之支持，福德充滿之幸運之象。凡事能積極進行，則更佳。" },
-            { pattern: "陰陽陽陽陽", name: "從隔卦", interpretation: "幸運已臨近，不必著急，前途非常光明，只要望著既定目標努力進行，必能有成。" },
-            { pattern: "陽陰陽陽陽", name: "曲直卦", interpretation: "天雖不從人願，使你勞苦有加，然萬勿灰心洩氣，忍耐上進，相信最後勝利將屬於你。" },
-            { pattern: "陽陽陰陽陽", name: "潤下卦", interpretation: "冬盡春來，大地萬象更新，花開喜溢，花落結果之幸運之象。" },
-            { pattern: "陽陽陽陰陽", name: "災正卦", interpretation: "要有百折不撓的精神，繼續向前邁進，才能克服困難，打開僵局，見到光明，要是畏縮不進，將更陷入困窮境地。" },
-            { pattern: "陽陽陽陽陰", name: "進檣卦", interpretation: "遇到任何挫折時，切不可自暴自棄，不斷的努力，他日必有好光景。" },
-            { pattern: "陰陰陽陽陽", name: "進求卦", interpretation: "在年輕時代，雖嘗了不少苦，只要有進取心，不氣餒，終會苦盡甘來，這是雪上開花之象。" },
-            { pattern: "陰陽陰陽陽", name: "進寶卦", interpretation: "語云「有德之人，天報以德。」從此辛勞已得果，幸運到訪，精神物質兩如意。" },
-            { pattern: "陰陽陽陽陰", name: "獲安卦", interpretation: "雖有各種各樣的問題，常使心不安，但只要繼續努力，事態必能漸見好轉。" },
-            { pattern: "陰陽陽陰陽", name: "遂心卦", interpretation: "名利雙收，衣食豐隆！令人羨慕的幸運。" },
-            { pattern: "陽陰陰陽陽", name: "災散卦", interpretation: "喜氣盈滿，可獲得父母、朋友、上司、前輩的助力，同時更能給予周圍的人份外的好感。" },
-            { pattern: "陽陰陽陰陽", name: "上進卦", interpretation: "處事須有勇氣，必可得上司、前輩的提拔，好機會已迫近眼前，應好好利用。" },
-            { pattern: "陽陰陽陽陰", name: "暗昧卦", interpretation: "維持現狀，靜以待時，交際、交易、說話都要謹慎，以免招來災禍。" },
-            { pattern: "陽陽陰陰陽", name: "安靜卦", interpretation: "計劃的事，已進行的事，波折橫生，使你深受打擊，但別衝動，冷靜地研究對策，以靜制動吧！" },
-            { pattern: "陽陽陰陽陰", name: "玄武卦", interpretation: "運不佳，只有保守現狀外，別無良法。他助不如自助，求人不如求己。" },
-            { pattern: "陽陽陽陰陰", name: "保安卦", interpretation: "飛黃騰達的時機，應該積極的進行，一定有好的收穫。工作、經商按照新的計劃一件一件地進行吧！" },
-            { pattern: "陰陰陰陽陽", name: "喜至卦", interpretation: "不必著急，只要堅守現在的崗位，充實自己的一切力量，開運機會已不遠。" },
-            { pattern: "陰陰陽陰陽", name: "保命卦", interpretation: "運氣不順，連綿不斷的打擊，使你失掉信心，且常與骨肉之親發生爭執，並多招惹口舌是非。" },
-            { pattern: "陰陰陽陽陰", name: "猶豫卦", interpretation: "春在人間，大地到處充滿了鳥語花香，此時的你是被幸福所包圍。" },
-            { pattern: "陰陽陰陰陽", name: "豐稔卦", interpretation: "沒有比現在更幸運，更幸福的時候到了，所謀所望皆如意，可以好好計劃事業，著手進行。" },
-            { pattern: "陰陽陰陽陰", name: "得祿卦", interpretation: "過去雖有糾紛，或不如意的事，現在已解決告一段落，從此光明漸見。" },
-            { pattern: "陰陽陽陰陰", name: "明顯卦", interpretation: "過去的貧困和煩惱，都已經煙消雲散，從此物質精神兩無憂，自由自在樂安康。" },
-            { pattern: "陽陰陰陰陽", name: "祐福卦", interpretation: "機會總是不湊巧，要見的人見不到，徒勞往返，不如意事十之八九。" },
-            { pattern: "陽陰陰陽陰", name: "凝滯卦", interpretation: "多年來所計劃的一切事宜，已漸接近實現階段，只要百尺竿頭更進一步，前途可說光明極了。" },
-            { pattern: "陽陰陽陰陰", name: "顯達卦", interpretation: "忍耐和努力的結果，使你由不安和困苦中漸入佳境。" },
-            { pattern: "陽陽陰陰陰", name: "福源卦", interpretation: "不應自滿，凡事謹慎從事，做事自然安全。" },
-            { pattern: "陽陰陰陰陰", name: "太平卦", interpretation: "經一番勞苦後，幸福的女神終於向你靠近，此時開運的序曲已開始彈奏。" },
-            { pattern: "陰陰陰陽陰", name: "顛險卦", interpretation: "只要你野心不太大，你的花園是充滿安泰。工作方面、金錢方面皆順利。" },
-            { pattern: "陰陰陽陰陰", name: "開發卦", interpretation: "沒有什麼可憂心的問題，一年四季中，平和愉快地過活。有時也有意外的幸運來臨，使你長年的努力，獲得應有的報酬。" },
-            { pattern: "陰陰陰陰陽", name: "揚吉卦", interpretation: "現時處境猶如臨深淵，如履薄冰，心情不免戰戰兢兢。須以冷靜的頭腦去克服困難，必可開創光明的前途。" },
-            { pattern: "陰陽陰陰陰", name: "後吉卦", interpretation: "如深陷泥沼中，進退維谷，時時有嫉妒和反感，阻礙你前進道路，使你不得不苦勞。" },
-            { pattern: "陽陽陽陽陽", name: "不利卦", interpretation: "你的寶鏡蒙上灰塵，不能照出你美妙的姿態。在不安的生活中，身心疲憊。要特別注意健康方面。" }
+            { pattern: "陰陰陰陰陰", name: "星震卦(上上)", interpretation: "禍消福至、求官得位、求財大利、婚姻成就、出行大吉、占病得安、做事大吉、考試得意。" },
+            { pattern: "陰陽陽陽陽", name: "從隔卦(上平)", interpretation: "行事得利、作事可成、占訟和吉、求官得位、走失見近、婚姻成吉、運途漸吉、作事如意。" },
+            { pattern: "陽陰陽陽陽", name: "曲直卦(中平)", interpretation: "出行吉利、謀事成就、占孕生男、家宅大吉、運途漸轉、占病不妨、作事如意、月令小吉。" },
+            { pattern: "陽陽陰陽陽", name: "潤下卦(小平)", interpretation: "人口平安、作事小心、求財六分、六甲生男、交易成吉、占訟和吉、行人得信、運途好轉。" },
+            { pattern: "陽陽陽陰陽", name: "災正卦(下下)", interpretation: "求謀有阻、出行平平、求財落空、占訟不和、婚姻平常、尋人不見、家室小康、運途不好。" },
+            { pattern: "陽陽陽陽陰", name: "進檣卦(平平)", interpretation: "謀事不成、家運小康、作事不好、占訟不好、考試不利、出行小心、行人成至、六甲生女。" },
+            { pattern: "陰陰陽陽陽", name: "進求卦(上上)", interpretation: "求官得位、作事成就、開市大吉、六甲生男、求財十分、家宅大吉、占訟有理、運途如意。" },
+            { pattern: "陰陽陰陽陽", name: "進寶卦(上吉)", interpretation: "求官得位、求財十分、六甲生男、考試上一、占病得安、婚姻成就、作事可成、運途如意。" },
+            { pattern: "陰陽陽陽陰", name: "獲安卦(中吉)", interpretation: "求官遠吉、占病無妨、求財三分、六甲生女、婚姻暫談、尋人得見、考試得中、運途大吉。" },
+            { pattern: "陰陽陽陰陽", name: "遂心卦(中吉)", interpretation: "謀事可成、運途小吉、作事小心、求財八分、交易和合、六甲生男、口舌無妨、婚姻成就。" },
+            { pattern: "陽陰陰陽陽", name: "災散卦(大吉)", interpretation: "求官得位、求財九分、六甲生男、婚姻成就、家宅安康、運途如意、生意得利、貴人扶持。" },
+            { pattern: "陽陰陽陰陽", name: "上進卦(上平)", interpretation: "求官得位、占訟和吉、口舌無妨、作事可成、求財八分、出行大吉、婚姻可成、運途大利。" },
+            { pattern: "陽陰陽陽陰", name: "暗昧卦(下凶)", interpretation: "謀事不成、交易不利、求財落空、尋人不見、六甲生女、行人未至、生意不利、運途大凶。" },
+            { pattern: "陽陽陰陰陽", name: "安靜卦(下中)", interpretation: "功名未遂、出行不宜、作事不成、占病難癒、六甲生女、口舌臨身、運途不好、凡事小吉。" },
+            { pattern: "陽陽陰陽陰", name: "玄武卦(下凶)", interpretation: "求財不利、尋人不見、走失落空、六甲生男、婚姻不成、占訟不和、運途不利、身體小康。" },
+            { pattern: "陽陽陽陰陰", name: "保安卦(平吉)", interpretation: "求官得位、求財九分、作事可成、官訟和理、口舌消散、光明上進、運途如意、婚姻成就。" },
+            { pattern: "陰陰陰陽陽", name: "喜至卦(中吉)", interpretation: "謀事暫成、作事平平、求財六分、婚姻平常、身體小康、六甲生女、出行謀財、事事遂心。" },
+            { pattern: "陰陰陽陰陽", name: "保命卦(中平)", interpretation: "口舌無妨、謀事可成、凡事小心、求財七分、求官得位、家運小康、六甲生男、占病無妨。" },
+            { pattern: "陰陰陽陽陰", name: "猶豫卦(下下)", interpretation: "出行小心、婚姻不成、謀事不成、貴人不佳、凡事不好、錢財落空、人口不安、家運不利。" },
+            { pattern: "陰陽陰陰陽", name: "豐稔卦(上平)", interpretation: "謀事成就、求官得位、出行大吉、月令平常、身體小康、口舌消除、作事可成、家運如意。" },
+            { pattern: "陰陽陰陽陰", name: "得祿卦(上吉)", interpretation: "婚姻可成、謀事成就、求官得位、占訟和吉、求財大利、口舌消散、作事可成、運途如意。" },
+            { pattern: "陰陽陽陰陰", name: "明顯卦(吉)", interpretation: "出行大吉、求官得位、口舌消散、婚姻成就、凡事如意、事事遂心、生意得利、身體安康。" },
+            { pattern: "陽陰陰陰陽", name: "祐福卦(吉)", interpretation: "婚姻可成、先明上進、求財十分、交易大利、作事成就、生意得利、六甲生男、家運平安。" },
+            { pattern: "陽陰陰陽陰", name: "凝滯卦(下)", interpretation: "婚姻平平、六甲生女、求官不成、謀事不成、凡事小心、走失不見、求財落空、運途不佳。" },
+            { pattern: "陽陰陽陰陰", name: "顯達卦(吉)", interpretation: "口舌消除、求官得位、六甲生男、凡事平常、求財六分、作事小心、出行大吉、運途如意。" },
+            { pattern: "陽陽陰陰陰", name: "福源卦(吉)", interpretation: "口舌無妨、出行大利、謀事可成、求官得位、事事遂心、作事成之、求財七分、家宅大吉。" },
+            { pattern: "陽陰陰陰陰", name: "太平卦(大吉)", interpretation: "婚姻可就、占病無妨、口舌消除、出行大吉、交易得意、謀事成就、求財七分、運途大吉。" },
+            { pattern: "陰陰陰陽陰", name: "顛險卦(下)", interpretation: "求官得位、凡事小心、口舌臨身、出行不利、作事不成、婚事不好、六甲生女、身體小康。" },
+            { pattern: "陰陰陽陰陰", name: "開發卦(吉)", interpretation: "占病無妨、婚姻成就、謀事成功、口舌漸消、貴人扶持、出行大利、光明上進、家運小康。" },
+            { pattern: "陰陰陰陰陽", name: "揚吉卦(吉)", interpretation: "交友助成、口舌消除、婚姻可成、求官得位、出行大吉、交易大利、作事可成、家運小康。" },
+            { pattern: "陰陽陰陰陰", name: "後吉卦(平)", interpretation: "占病不愈、求官得位、月令不佳、出行小吉、六甲生男、尋人不見、凡事小心、家運小康。" },
+            { pattern: "陽陽陽陽陽", name: "不利卦(下)", interpretation: "占訟不好、婚姻不好、謀事不成、出行不利、凡事小心、口舌禍端、財庫落空、家運小康。" }
         ];
 
         // DOM元素
